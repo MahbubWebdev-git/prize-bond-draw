@@ -19,7 +19,7 @@ body {
   text-align: center;
   margin-bottom: 32px;
   padding: 24px 16px;
-  background: #0b5d3b;
+  background: #FF8C00;
   color: #fff;
   border-radius: 8px;
 }
@@ -66,7 +66,7 @@ body {
   font-size: 1rem;
   border: none;
   border-radius: 6px;
-  background: #0b5d3b;
+  background: #FF8C00;
   color: #fff;
   cursor: pointer;
 }
@@ -91,15 +91,15 @@ body {
 }
 
 .result-card.win {
-  border-left: 6px solid #0b5d3b;
+  border-left: 6px solid #FF8C00;
 }
 
 .result-card.no-win {
-  border-left: 6px solid #b00020;
+  border-left: 6px solid #FF8C00;
 }
 
 .win-message {
-  color: #0b5d3b;
+  color: #FF8C00;
   font-weight: 600;
 }
 
@@ -133,16 +133,21 @@ td {
 }
 
 .navbar .brand {
+  margin-right: 10px;
   font-weight: 700;
-  color: #0b5d3b;
+  color: #FF8C00;
   text-decoration: none;
   font-size: 1.1rem;
+}
+
+a.link-btn {
+  color: #FF8C00;
 }
 
 .nav-links {
   display: flex;
   gap: 16px;
-  align-items: center;
+  justify-content: center;
 }
 
 .nav-links a {
@@ -197,7 +202,7 @@ td {
   font-size: 1rem;
   border: none;
   border-radius: 6px;
-  background: #0b5d3b;
+  background: #FF8C00;
   color: #fff;
   cursor: pointer;
 }
@@ -240,9 +245,9 @@ td {
 }
 
 .tab.active {
-  background: #0b5d3b;
+  background: #FF8C00;
   color: #fff;
-  border-color: #0b5d3b;
+  border-color: #FF8C00;
 }
 
 input[type="file"] {

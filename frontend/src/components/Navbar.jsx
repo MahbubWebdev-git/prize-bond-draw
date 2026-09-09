@@ -12,9 +12,9 @@ export default function Navbar() {
 
   return (
     <nav className="navbar">
-      <Link to="/" className="brand">Lottery Draw</Link>
+      <Link to="/" className="brand"> Lottery Draw </Link>
       <div className="nav-links">
-        <Link to="/">Public Search</Link>
+        <Link to="/"> Public Search</Link>
         <Link to="/draws">Draw Archive</Link>
         {user ? (
           <>

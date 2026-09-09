@@ -8,7 +8,7 @@ export default function Gate({ children }) {
     return (
       <div className="result-card no-win">
         <p>Please login first to view draw results.</p>
-        <p><Link to="/login">Go to Login →</Link></p>
+        <p><Link className="link-btn" to="/login">Go to Login →</Link></p>
       </div>
     );
   }

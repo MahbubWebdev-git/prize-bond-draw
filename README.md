@@ -64,3 +64,13 @@ JWT_SECRET=your_secret_key
 
 # Start the application
 npm start
+
+👥 Roles & Permissions Workflow
+Guest User: Promoted to log in when attempting to access Home, Draw Archive, or Draw Detail.
+
+Pending User: Sees an "Awaiting Approval" notice after registration until processed by an Admin.
+
+Approved User / Admin: Accesses single/bulk bond checking, draw archives, and administrative control panels based on assigned roles.
+
+📄 License
+This project is licensed under the MIT License.
