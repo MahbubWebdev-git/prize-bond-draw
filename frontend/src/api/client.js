@@ -1,7 +1,11 @@
 import axios from "axios";
 
+// Dynamically sets API base URL based on environment variables, fallback to localhost for dev
+const baseURL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api";
+
 const api = axios.create({
-  baseURL: "http://localhost:8000/api",
+  baseURL: baseURL,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
