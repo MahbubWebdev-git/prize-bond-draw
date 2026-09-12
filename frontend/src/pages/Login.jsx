@@ -9,13 +9,14 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // src/pages/Login.jsx
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
       await login(form.email, form.password);
-      navigate("/dashboard");
+      window.location.href = "/prizebond_draw/dashboard";
     } catch (err) {
       setError(err?.response?.data?.message || "Invalid credentials.");
     } finally {
