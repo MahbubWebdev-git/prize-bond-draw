@@ -24,6 +24,7 @@ export default function App() {
             <Route path="/draws/:id" element={<DrawDetail />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
             {/* 2. Privacy Policy Route */}
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
