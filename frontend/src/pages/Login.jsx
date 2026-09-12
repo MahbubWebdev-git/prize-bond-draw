@@ -9,16 +9,19 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // src/pages/Login.jsx
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
     setLoading(true);
+
     try {
+      // AuthContext এর মাধ্যমে লগইন সম্পন্ন করা
       await login(form.email, form.password);
-      window.location.href = "/prizebond_draw/dashboard";
+
+      // Full page reload না দিয়ে React Router দিয়ে রিডাইরেক্ট করা
+      navigate("/dashboard", { replace: true });
     } catch (err) {
-      setError(err?.response?.data?.message || "Invalid credentials.");
+      setError(err?.response?.data?.message || "The provided credentials are incorrect.");
     } finally {
       setLoading(false);
     }
@@ -42,12 +45,17 @@ export default function Login() {
           value={form.password}
           onChange={(e) => setForm({ ...form, password: e.target.value })}
         />
-        {error && <p className="form-error">{error}</p>}
-        <button type="submit" disabled={loading}>
+
+        {/* ভুল পাসওয়ার্ড বা ইমেইল দিলে এই মেসেজটি আসবে */}
+        {error && <p className="form-error" style={{ color: "red", marginTop: "10px" }}>{error}</p>}
+
+        <button type="submit" disabled={loading} style={{ marginTop: "15px" }}>
           {loading ? "Logging in..." : "Login"}
         </button>
       </form>
-      <p>No account? <Link to="/register">Register</Link></p>
+      <p style={{ marginTop: "15px" }}>
+        No account? <Link to="/register">Register</Link>
+      </p>
     </main>
   );
 }

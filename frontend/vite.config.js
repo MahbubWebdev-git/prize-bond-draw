@@ -1,8 +1,15 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/prizebond_draw/', // Subdomain subfolder path
-})
+  server: {
+    proxy: {
+      '/prizebond_draw/backend': {
+        target: 'http://localhost:8000', // আপনার লোকাল Laravel URL
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/prizebond_draw\/backend/, ''),
+      },
+    },
+  },
+});

@@ -1,85 +1,64 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import api from "../api/client";
+// src/context/AuthContext.jsx
+import React, { createContext, useContext, useState, useEffect } from "react";
+import axios from "axios";
 
-const AuthContext = createContext(null);
+const AuthContext = createContext();
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    const stored = localStorage.getItem("ld_user");
-    return stored ? JSON.parse(stored) : null;
-  });
-  const [loading, setLoading] = useState(false);
-
-  function persist(token, user) {
-    localStorage.setItem("ld_token", token);
-    localStorage.setItem("ld_user", JSON.stringify(user));
-    setUser(user);
-  }
-
-  async function login(email, password) {
-    setLoading(true);
-    try {
-      const { data } = await api.post("/login", { email, password });
-      persist(data.token, data.user);
-      return data.user;
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function register(name, email, password, password_confirmation) {
-    setLoading(true);
-    try {
-      const { data } = await api.post("/register", {
-        name,
-        email,
-        password,
-        password_confirmation,
-      });
-      persist(data.token, data.user);
-      return data.user;
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function logout() {
-    try {
-      await api.post("/logout");
-    } catch (e) {
-      // ignore — clear local state regardless
-    }
-    localStorage.removeItem("ld_token");
-    localStorage.removeItem("ld_user");
-    setUser(null);
-  }
-
-  async function refreshMe() {
-    try {
-      const { data } = await api.get("/me");
-      localStorage.setItem("ld_user", JSON.stringify(data));
-      setUser(data);
-    } catch (e) {
-      localStorage.removeItem("ld_token");
-      localStorage.removeItem("ld_user");
-      setUser(null);
-    }
-  }
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (localStorage.getItem("ld_token")) {
-      refreshMe();
+    const storedToken = localStorage.getItem("token");
+    const storedUser = localStorage.getItem("user");
+
+    if (storedToken && storedUser) {
+      setToken(storedToken);
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (e) {
+        localStorage.removeItem("user");
+      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setLoading(false);
   }, []);
 
+  // Localhost এবং Live Server অনুযায়ী API Base URL সেট করুন
+  const API_BASE_URL = window.location.hostname === 'localhost'
+    ? 'http://localhost:8000/api'  // অথবা আপনার লোকাল Laravel Artisan Serve-এর URL
+    : '/prizebond_draw/backend/api';
+
+  const login = async (email, password) => {
+    const res = await axios.post(`${API_BASE_URL}/login`, {
+      email,
+      password,
+    });
+
+    if (res.data.token) {
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+
+      setToken(res.data.token);
+      setUser(res.data.user);
+    }
+    return res.data;
+  };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setToken(null);
+    setUser(null);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, refreshMe }}>
-      {children}
+    <AuthContext.Provider value={{ user, token, login, logout, loading }}>
+      {!loading && children}
     </AuthContext.Provider>
   );
-}
+};
 
-export function useAuth() {
+export const useAuth = () => {
   return useContext(AuthContext);
-}
+};
