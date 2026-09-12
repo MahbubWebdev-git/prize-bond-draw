@@ -1,0 +1,12 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /prizebond_draw/
+
+    # Backend / API-কে public/index.php তে সঠিকভাবে পাঠানো
+    RewriteRule ^backend/(.*)$ backend/public/$1 [L,QSA]
+
+    # Front-end React SPA Rules
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.html [L]
+</IfModule>
