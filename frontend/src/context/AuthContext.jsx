@@ -4,6 +4,13 @@ import axios from "axios";
 
 const AuthContext = createContext();
 
+const getApiBaseUrl = () => {
+  if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+    return "http://localhost:8000/api";
+  }
+  return "https://booking.dreamwebdev.com/prizebond_draw/backend/api";
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem("token") || null);
@@ -13,34 +20,38 @@ export const AuthProvider = ({ children }) => {
     const storedToken = localStorage.getItem("token");
     const storedUser = localStorage.getItem("user");
 
-    if (storedToken && storedUser) {
-      setToken(storedToken);
+    if (storedToken && storedUser && storedUser !== "undefined") {
       try {
+        setToken(storedToken);
         setUser(JSON.parse(storedUser));
       } catch (e) {
+        // Safe Catch: কোনো কারণে JSON ফরম্যাট ভুল থাকলে অটো ক্লিয়ার করবে
         localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        setUser(null);
+        setToken(null);
       }
+    } else {
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
     }
     setLoading(false);
   }, []);
 
-  // Localhost এবং Live Server অনুযায়ী API Base URL সেট করুন
-  const API_BASE_URL = window.location.hostname === 'localhost'
-    ? 'http://localhost:8000/api'  // অথবা আপনার লোকাল Laravel Artisan Serve-এর URL
-    : '/prizebond_draw/backend/api';
-
   const login = async (email, password) => {
-    const res = await axios.post(`${API_BASE_URL}/login`, {
+    const res = await axios.post(`${getApiBaseUrl()}/login`, {
       email,
       password,
     });
 
-    if (res.data.token) {
+    if (res.data && res.data.token) {
+      const userObj = res.data.user || {};
+
       localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
+      localStorage.setItem("user", JSON.stringify(userObj));
 
       setToken(res.data.token);
-      setUser(res.data.user);
+      setUser(userObj);
     }
     return res.data;
   };
