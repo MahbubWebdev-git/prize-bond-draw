@@ -18,6 +18,7 @@ class User extends Authenticatable
         'password',
         'role',
         'can_view_results',
+        'can_import_data',
     ];
 
     protected $hidden = [
@@ -31,11 +32,23 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'can_view_results' => 'boolean',
+            'can_import_data' => 'boolean',
         ];
     }
 
+    // role case-insensitive compare kore, jate "Admin" / "admin" dutoi kaj kore
     public function isAdmin(): bool
     {
-        return $this->role === 'admin';
+        return strtolower((string) $this->role) === 'admin';
+    }
+
+    public function canViewResults(): bool
+    {
+        return $this->isAdmin() || $this->can_view_results;
+    }
+
+    public function canImportData(): bool
+    {
+        return $this->isAdmin() || $this->can_import_data;
     }
 }

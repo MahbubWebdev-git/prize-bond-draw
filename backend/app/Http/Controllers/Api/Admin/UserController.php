@@ -10,7 +10,7 @@ class UserController extends Controller
 {
     public function index()
     {
-        return User::select('id', 'name', 'email', 'role', 'can_view_results', 'created_at')
+        return User::select('id', 'name', 'email', 'role', 'can_view_results', 'can_import_data', 'created_at')
             ->orderBy('name')
             ->get();
     }
@@ -20,6 +20,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'role' => ['sometimes', 'in:admin,user'],
             'can_view_results' => ['sometimes', 'boolean'],
+            'can_import_data' => ['sometimes', 'boolean'],
         ]);
 
         if ($request->user()->id === $user->id && isset($validated['role']) && $validated['role'] !== 'admin') {

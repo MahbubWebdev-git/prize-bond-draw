@@ -42,47 +42,58 @@ export default function Admin() {
     <main>
       <header className="site-header">
         <h1>Admin — Manage Users</h1>
-        <p className="subtitle">Grant users permission to view draw results</p>
+        <p className="subtitle">Grant users permission to view results or import data</p>
       </header>
 
       {error && <p className="form-error">{error}</p>}
 
-      <table className="admin-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Can View Results</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((u) => (
-            <tr key={u.id}>
-              <td>{u.name}</td>
-              <td>{u.email}</td>
-              <td>
-                <select
-                  value={u.role}
-                  disabled={savingId === u.id}
-                  onChange={(e) => updateUser(u.id, { role: e.target.value })}
-                >
-                  <option value="user">user</option>
-                  <option value="admin">admin</option>
-                </select>
-              </td>
-              <td>
-                <input
-                  type="checkbox"
-                  checked={u.can_view_results}
-                  disabled={savingId === u.id}
-                  onChange={(e) => updateUser(u.id, { can_view_results: e.target.checked })}
-                />
-              </td>
+      <div className="admin-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Can View Results</th>
+              <th>Can Import Data</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {users.map((u) => (
+              <tr key={u.id}>
+                <td>{u.name}</td>
+                <td>{u.email}</td>
+                <td>
+                  <select
+                    value={u.role}
+                    disabled={savingId === u.id}
+                    onChange={(e) => updateUser(u.id, { role: e.target.value })}
+                  >
+                    <option value="user">user</option>
+                    <option value="admin">admin</option>
+                  </select>
+                </td>
+                <td>
+                  <input
+                    type="checkbox"
+                    checked={u.can_view_results}
+                    disabled={savingId === u.id}
+                    onChange={(e) => updateUser(u.id, { can_view_results: e.target.checked })}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="checkbox"
+                    checked={u.can_import_data}
+                    disabled={savingId === u.id}
+                    onChange={(e) => updateUser(u.id, { can_import_data: e.target.checked })}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </main>
   );
 }
