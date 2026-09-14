@@ -1,75 +1,102 @@
-// src/context/AuthContext.jsx
-import React, { createContext, useContext, useState, useEffect } from "react";
-import axios from "axios";
+import { createContext, useContext, useEffect, useState } from "react";
+import api from "../api/client";
 
-const AuthContext = createContext();
+const AuthContext = createContext(null);
 
-const getApiBaseUrl = () => {
-  if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-    return "http://localhost:8000/api";
+function readStoredUser() {
+  const stored = localStorage.getItem("ld_user");
+  if (!stored || stored === "undefined" || stored === "null") {
+    return null;
   }
-  return "https://booking.dreamwebdev.com/prizebond_draw/backend/api";
-};
+  try {
+    return JSON.parse(stored);
+  } catch (e) {
+    // Corrupted value from an earlier bug/session — clear it instead of crashing.
+    localStorage.removeItem("ld_user");
+    return null;
+  }
+}
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem("token") || null);
-  const [loading, setLoading] = useState(true);
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(readStoredUser);
+  const [loading, setLoading] = useState(false);
+
+  function persist(token, user) {
+    if (!token || !user) {
+      // Never store an undefined/empty value — that's what caused the crash.
+      return;
+    }
+    localStorage.setItem("ld_token", token);
+    localStorage.setItem("ld_user", JSON.stringify(user));
+    setUser(user);
+  }
+
+  async function login(email, password) {
+    setLoading(true);
+    try {
+      const { data } = await api.post("/login", { email, password });
+      persist(data.token, data.user);
+      return data.user;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function register(name, email, password, password_confirmation) {
+    setLoading(true);
+    try {
+      const { data } = await api.post("/register", {
+        name,
+        email,
+        password,
+        password_confirmation,
+      });
+      persist(data.token, data.user);
+      return data.user;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function logout() {
+    try {
+      await api.post("/logout");
+    } catch (e) {
+      // ignore — clear local state regardless
+    }
+    localStorage.removeItem("ld_token");
+    localStorage.removeItem("ld_user");
+    setUser(null);
+  }
+
+  async function refreshMe() {
+    try {
+      const { data } = await api.get("/me");
+      if (data) {
+        localStorage.setItem("ld_user", JSON.stringify(data));
+        setUser(data);
+      }
+    } catch (e) {
+      localStorage.removeItem("ld_token");
+      localStorage.removeItem("ld_user");
+      setUser(null);
+    }
+  }
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    const storedUser = localStorage.getItem("user");
-
-    if (storedToken && storedUser && storedUser !== "undefined") {
-      try {
-        setToken(storedToken);
-        setUser(JSON.parse(storedUser));
-      } catch (e) {
-        // Safe Catch: কোনো কারণে JSON ফরম্যাট ভুল থাকলে অটো ক্লিয়ার করবে
-        localStorage.removeItem("user");
-        localStorage.removeItem("token");
-        setUser(null);
-        setToken(null);
-      }
-    } else {
-      localStorage.removeItem("user");
-      localStorage.removeItem("token");
+    if (localStorage.getItem("ld_token")) {
+      refreshMe();
     }
-    setLoading(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const login = async (email, password) => {
-    const res = await axios.post(`${getApiBaseUrl()}/login`, {
-      email,
-      password,
-    });
-
-    if (res.data && res.data.token) {
-      const userObj = res.data.user || {};
-
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(userObj));
-
-      setToken(res.data.token);
-      setUser(userObj);
-    }
-    return res.data;
-  };
-
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setToken(null);
-    setUser(null);
-  };
-
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, loading }}>
-      {!loading && children}
+    <AuthContext.Provider value={{ user, loading, login, register, logout, refreshMe }}>
+      {children}
     </AuthContext.Provider>
   );
-};
+}
 
-export const useAuth = () => {
+export function useAuth() {
   return useContext(AuthContext);
-};
+}
