@@ -14,18 +14,13 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-	  'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
-   	  'can.view.results' => \App\Http\Middleware\EnsureCanViewResults::class,
-	]);
+            'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
+            'can.view.results' => \App\Http\Middleware\EnsureCanViewResults::class,
+            'can.import.data' => \App\Http\Middleware\EnsureCanImportData::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
-	
-	$middleware->alias([
-    	 'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
-    	 'can.view.results' => \App\Http\Middleware\EnsureCanViewResults::class,
-    	 'can.import.data' => \App\Http\Middleware\EnsureCanImportData::class,
-	]);
     })->create();
