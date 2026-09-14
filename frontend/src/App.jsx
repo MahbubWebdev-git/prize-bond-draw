@@ -14,7 +14,7 @@ import "./App.css";
 
 export default function App() {
   return (
-    <BrowserRouter basename="/prizebond_draw">
+    <BrowserRouter basename="/prizebond_draw/">
       <AuthProvider>
         <div className="page">
           <Navbar />
