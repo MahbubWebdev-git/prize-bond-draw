@@ -11,15 +11,15 @@ class SearchController extends Controller
     public function search(Request $request)
     {
         $validated = $request->validate([
-            // Accept numeric strings; integers from JSON get cast below.
             'number' => ['required'],
         ]);
 
-        // 1. Normalize: trim hidden spaces/unicode, keep digits only.
+        // ১. নরমালইজেশন: হিডেন স্পেস ও ইউনিকোড ক্যারেক্টার রিমুভ করা
         $raw = trim((string) $validated['number']);
-        // Remove common invisible chars (NBSP, zero-width) then non-digits.
         $raw = str_replace(["\u{00A0}", "\u{200B}", "\u{200C}", "\u{200D}", "\u{FEFF}"], '', $raw);
         $raw = trim($raw);
+        
+        // শুধু ডিজিটগুলো রাখা
         $digits = preg_replace('/\D+/', '', $raw) ?? '';
 
         if ($digits === '' || strlen($digits) > 10) {
@@ -32,12 +32,19 @@ class SearchController extends Controller
             ], 422);
         }
 
-        // Search candidates: zero-padded 6-digit form (canonical storage),
-        // the raw digits, and the ltrim'd form (covers legacy unpadded rows
-        // and numbers with leading zeros typed by the user).
-        $padded = str_pad($digits, 6, '0', STR_PAD_LEFT);
-        $candidates = array_values(array_unique([$padded, $digits, ltrim($digits, '0') === '' ? '0' : ltrim($digits, '0')]));
+        // ২. ক্যান্ডিডেট অ্যারে মডিফিকেশন (৭ ডিজিট ও ৬ ডিজিট উভয়ই সাপোর্ট করবে)
+        // বাংলাদেশের প্রাইজবন্ড অনুযায়ী ৭ ডিজিট ও ৬ ডিজিট উভয় প্যাডিংই ক্যান্ডিডেটে রাখা হলো
+        $padded6 = str_pad($digits, 6, '0', STR_PAD_LEFT);
+        $padded7 = str_pad($digits, 7, '0', STR_PAD_LEFT);
+        
+        $candidates = array_values(array_unique([
+            $digits, 
+            $padded6, 
+            $padded7, 
+            ltrim($digits, '0') === '' ? '0' : ltrim($digits, '0')
+        ]));
 
+        // ৩. ডাটাবেজ কোয়েরি
         $matches = WinningNumber::with('draw')
             ->whereIn('number', $candidates)
             ->get()

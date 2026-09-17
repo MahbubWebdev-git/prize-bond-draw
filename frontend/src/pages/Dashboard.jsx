@@ -6,6 +6,7 @@ import SearchForm from "../components/SearchForm";
 import ResultCard from "../components/ResultCard";
 import BulkSearchForm from "../components/BulkSearchForm";
 import BulkResultsTable from "../components/BulkResultsTable";
+import DrawInsertForm from "../components/DrawInsertForm"; // গিট পুলে আসা নতুন কম্পোনেন্ট
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -35,7 +36,6 @@ export default function Dashboard() {
 
   const isAdmin = user.role === "admin";
   const isApproved = isAdmin || !!user.is_approved;
-  // Approved normal users can ONLY search. Bulk upload + data insert = admin-only.
   const canView = isAdmin || (isApproved && user.can_view_results);
   const canImport = isAdmin;
 
@@ -78,14 +78,19 @@ export default function Dashboard() {
         <p className="subtitle">Welcome, {user.name}</p>
       </header>
 
-      <div className="tabs flex flex-col sm:flex-row gap-2">
+      <div className="tabs flex flex-col sm:flex-row gap-2 mb-4">
         <button className={tab === "single" ? "tab active" : "tab"} onClick={() => setTab("single")}>
           Single Search
         </button>
         {canImport && (
-          <button className={tab === "bulk" ? "tab active" : "tab"} onClick={() => setTab("bulk")}>
-            Bulk Upload
-          </button>
+          <>
+            <button className={tab === "bulk" ? "tab active" : "tab"} onClick={() => setTab("bulk")}>
+              Bulk Upload
+            </button>
+            <button className={tab === "insert" ? "tab active" : "tab"} onClick={() => setTab("insert")}>
+              Insert New Number
+            </button>
+          </>
         )}
       </div>
 
@@ -114,6 +119,13 @@ export default function Dashboard() {
           {bulkError && <p className="form-error">{bulkError}</p>}
           <BulkResultsTable data={bulkResult} />
         </>
+      )}
+
+      {tab === "insert" && canImport && (
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-bold mb-4">Add Winning Number Manually</h2>
+          <DrawInsertForm />
+        </div>
       )}
     </main>
   );
