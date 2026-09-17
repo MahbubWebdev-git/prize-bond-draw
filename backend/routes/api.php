@@ -29,5 +29,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('admin')->prefix('admin')->group(function () {
         Route::get('/users', [AdminUserController::class, 'index']);
         Route::patch('/users/{user}', [AdminUserController::class, 'update']);
+        Route::delete('/users/{user}', [AdminUserController::class, 'destroy']);
+        // Admin-only lottery data entry (manual insert + CSV/XLS bulk upload).
+        Route::post('/draws', [DrawController::class, 'store']);
+        Route::post('/draws/import', [DrawController::class, 'import']);
     });
 });

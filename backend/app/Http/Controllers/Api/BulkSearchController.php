@@ -33,8 +33,10 @@ class BulkSearchController extends Controller
         $numbers = [];
         foreach ($rows as $row) {
             $raw = trim((string) ($row[0] ?? ''));
-            if ($raw !== '' && preg_match('/^[0-9]+$/', $raw)) {
-                $numbers[] = $raw;
+            $raw = str_replace(["\u{00A0}", "\u{200B}", "\u{200C}", "\u{200D}", "\u{FEFF}"], '', $raw);
+            $digits = preg_replace('/\D+/', '', trim($raw)) ?? '';
+            if ($digits !== '' && strlen($digits) <= 10) {
+                $numbers[] = $digits;
             }
         }
 
@@ -46,10 +48,17 @@ class BulkSearchController extends Controller
             ], 422);
         }
 
-        $padded = array_map(fn ($n) => str_pad($n, 6, '0', STR_PAD_LEFT), $numbers);
+        // Match against padded + raw + trimmed forms so legacy rows still hit.
+        $candidates = [];
+        foreach ($numbers as $n) {
+            $candidates[] = str_pad($n, 6, '0', STR_PAD_LEFT);
+            $candidates[] = $n;
+            $candidates[] = ltrim($n, '0') === '' ? '0' : ltrim($n, '0');
+        }
+        $candidates = array_values(array_unique($candidates));
 
         $winningByNumber = WinningNumber::with('draw')
-            ->whereIn('number', $padded)
+            ->whereIn('number', $candidates)
             ->get()
             ->groupBy('number');
 
@@ -57,8 +66,15 @@ class BulkSearchController extends Controller
         $wonCount = 0;
 
         foreach ($numbers as $original) {
-            $key = str_pad($original, 6, '0', STR_PAD_LEFT);
-            $matches = $winningByNumber->get($key, collect());
+            $keys = array_values(array_unique([
+                str_pad($original, 6, '0', STR_PAD_LEFT),
+                $original,
+                ltrim($original, '0') === '' ? '0' : ltrim($original, '0'),
+            ]));
+            $matches = collect();
+            foreach ($keys as $key) {
+                $matches = $matches->merge($winningByNumber->get($key, collect()));
+            }
 
             if ($matches->isEmpty()) {
                 $results[] = [

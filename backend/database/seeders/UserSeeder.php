@@ -16,7 +16,9 @@ class UserSeeder extends Seeder
                 'name' => 'Admin',
                 'password' => Hash::make('password'),
                 'role' => 'admin',
+                'is_approved' => true,
                 'can_view_results' => true,
+                'can_import_data' => true,
             ]
         );
 
@@ -26,7 +28,9 @@ class UserSeeder extends Seeder
                 'name' => 'Sample User',
                 'password' => Hash::make('password'),
                 'role' => 'user',
-                'can_view_results' => false,
+                'is_approved' => true,
+                'can_view_results' => true,
+                'can_import_data' => false,
             ]
         );
     }

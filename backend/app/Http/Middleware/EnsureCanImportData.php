@@ -12,9 +12,10 @@ class EnsureCanImportData
     {
         $user = $request->user();
 
+        // Only approved admins may use bulk-upload / import endpoints.
         if (! $user || ! $user->canImportData()) {
             return response()->json([
-                'message' => 'You do not have permission to import lottery data yet. Please contact an admin.',
+                'message' => 'You do not have permission to import lottery data. Bulk upload is admin-only.',
             ], 403);
         }
 

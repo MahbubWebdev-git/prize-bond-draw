@@ -13,6 +13,12 @@ class EnsureCanViewResults
         $user = $request->user();
 
         if (! $user || ! $user->canViewResults()) {
+            if ($user && ! $user->isApproved()) {
+                return response()->json([
+                    'message' => 'Your account is pending admin approval.',
+                ], 403);
+            }
+
             return response()->json([
                 'message' => 'You do not have permission to view draw results yet. Please contact an admin.',
             ], 403);

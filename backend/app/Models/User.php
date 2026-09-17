@@ -17,6 +17,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'is_approved',
         'can_view_results',
         'can_import_data',
     ];
@@ -31,6 +32,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_approved' => 'boolean',
             'can_view_results' => 'boolean',
             'can_import_data' => 'boolean',
         ];
@@ -42,13 +44,21 @@ class User extends Authenticatable
         return strtolower((string) $this->role) === 'admin';
     }
 
+    public function isApproved(): bool
+    {
+        // Admins are always treated as approved.
+        return $this->isAdmin() || (bool) $this->is_approved;
+    }
+
     public function canViewResults(): bool
     {
-        return $this->isAdmin() || $this->can_view_results;
+        // Approved normal users can ONLY search (view results).
+        return $this->isApproved() && ($this->isAdmin() || $this->can_view_results);
     }
 
     public function canImportData(): bool
     {
-        return $this->isAdmin() || $this->can_import_data;
+        // Only admins may bulk-upload / insert data — never normal users.
+        return $this->isAdmin();
     }
 }
