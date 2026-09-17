@@ -35,6 +35,12 @@ export function AuthProvider({ children }) {
     setLoading(true);
     try {
       const { data } = await api.post("/login", { email, password });
+      // Backend returns 403 + pending message when not approved (no token).
+      if (!data?.token || !data?.user) {
+        const err = new Error(data?.message || "Your account is pending admin approval.");
+        err.response = { data };
+        throw err;
+      }
       persist(data.token, data.user);
       return data.user;
     } finally {
@@ -51,8 +57,9 @@ export function AuthProvider({ children }) {
         password,
         password_confirmation,
       });
-      persist(data.token, data.user);
-      return data.user;
+      // New users are NOT auto-logged in anymore — they need admin approval.
+      // Do NOT persist anything; return the pending message for the UI.
+      return data;
     } finally {
       setLoading(false);
     }

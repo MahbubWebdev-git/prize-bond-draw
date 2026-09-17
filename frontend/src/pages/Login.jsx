@@ -21,7 +21,14 @@ export default function Login() {
       // Full page reload না দিয়ে React Router দিয়ে রিডাইরেক্ট করা
       navigate("/dashboard", { replace: true });
     } catch (err) {
-      setError(err?.response?.data?.message || "The provided credentials are incorrect.");
+      const status = err?.response?.status;
+      const serverMsg = err?.response?.data?.message || "";
+      // Pending-approval logins return 403 with that exact message.
+      if (status === 403 && /pending admin approval/i.test(serverMsg)) {
+        setError("Your account is pending admin approval.");
+      } else {
+        setError(serverMsg || "The provided credentials are incorrect.");
+      }
     } finally {
       setLoading(false);
     }

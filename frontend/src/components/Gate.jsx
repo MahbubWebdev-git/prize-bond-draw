@@ -13,6 +13,14 @@ export default function Gate({ children }) {
     );
   }
 
+  if (!user.is_approved && user.role !== "admin") {
+    return (
+      <div className="result-card no-win">
+        <p>Your account is pending admin approval.</p>
+      </div>
+    );
+  }
+
   const allowed = user.role === "admin" || user.can_view_results;
 
   if (!allowed) {

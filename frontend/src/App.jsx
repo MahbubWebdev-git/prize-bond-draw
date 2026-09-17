@@ -48,11 +48,11 @@ export default function App() {
           </Routes>
 
           {/* 3. Updated SEO & AdSense Friendly Footer */}
-          <footer className="site-footer" style={{ borderTop: "1px solid #e2e8f0", padding: "20px 0", textAlign: "center", backgroundColor: "#ffffff" }}>
+          <footer className="site-footer" style={{ borderTop: "1px solid #e2e8f0", padding: "20px 12px", textAlign: "center", backgroundColor: "#ffffff" }}>
             <p style={{ margin: "0 0 8px 0", color: "#64748b", fontSize: "14px" }}>
               © 2026 PrizeBondCheck — Full-Stack Portfolio Project by <strong>Mahbub Webdev</strong>.
             </p>
-            <div style={{ display: "flex", justifyContent: "center", gap: "15px", fontSize: "13px" }}>
+            <div className="site-footer-links">
               <Link to="/privacy-policy" style={{ color: "#d97706", textDecoration: "none", fontWeight: "500" }}>
                 Privacy Policy
               </Link>

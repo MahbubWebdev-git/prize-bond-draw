@@ -3,19 +3,9 @@ import { Link } from 'react-router-dom';
 
 export default function PrivacyPolicy() {
     return (
-        <div style={{ backgroundColor: "#f8fafc", minHeight: "100vh", padding: "40px 20px" }}>
-            <div
-                style={{
-                    maxWidth: "850px",
-                    margin: "0 auto",
-                    background: "#ffffff",
-                    padding: "35px",
-                    borderRadius: "12px",
-                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-                    border: "1px solid #e2e8f0"
-                }}
-            >
-                <h1 style={{ color: "#0f172a", fontSize: "2rem", marginBottom: "8px", borderBottom: "2px solid #e2e8f0", paddingBottom: "12px" }}>
+        <div className="w-full min-h-screen bg-slate-50 px-4 py-6 sm:py-10 overflow-x-clip">
+            <div className="max-w-3xl mx-auto bg-white px-5 py-6 sm:p-9 rounded-xl shadow border border-slate-200 w-full">
+                <h1 className="text-2xl sm:text-3xl text-slate-900 font-bold mb-2 border-b-2 border-slate-200 pb-3">
                     Privacy Policy
                 </h1>
                 <p style={{ color: "#64748b", fontSize: "0.9rem", marginBottom: "25px" }}>

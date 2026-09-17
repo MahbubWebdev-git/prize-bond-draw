@@ -33,8 +33,11 @@ export default function Dashboard() {
     );
   }
 
-  const canView = user.role === "admin" || user.can_view_results;
-  const canImport = user.role === "admin" || user.can_import_data;
+  const isAdmin = user.role === "admin";
+  const isApproved = isAdmin || !!user.is_approved;
+  // Approved normal users can ONLY search. Bulk upload + data insert = admin-only.
+  const canView = isAdmin || (isApproved && user.can_view_results);
+  const canImport = isAdmin;
 
   async function handleSearch(number) {
     setLoading(true);
@@ -69,20 +72,28 @@ export default function Dashboard() {
   }
 
   return (
-    <main>
+    <main className="w-full">
       <header className="site-header">
         <h1>Dashboard</h1>
         <p className="subtitle">Welcome, {user.name}</p>
       </header>
 
-      <div className="tabs">
+      <div className="tabs flex flex-col sm:flex-row gap-2">
         <button className={tab === "single" ? "tab active" : "tab"} onClick={() => setTab("single")}>
           Single Search
         </button>
-        <button className={tab === "bulk" ? "tab active" : "tab"} onClick={() => setTab("bulk")}>
-          Bulk Upload
-        </button>
+        {canImport && (
+          <button className={tab === "bulk" ? "tab active" : "tab"} onClick={() => setTab("bulk")}>
+            Bulk Upload
+          </button>
+        )}
       </div>
+
+      {!isApproved && (
+        <div className="result-card no-win">
+          <p>Your account is pending admin approval.</p>
+        </div>
+      )}
 
       {tab === "single" &&
         (canView ? (
@@ -91,24 +102,19 @@ export default function Dashboard() {
             {errorMsg && <p className="form-error">{errorMsg}</p>}
             <ResultCard result={result} />
           </>
-        ) : (
+        ) : isApproved ? (
           <div className="result-card no-win">
             <p>Your account is awaiting admin approval to view draw results.</p>
           </div>
-        ))}
+        ) : null)}
 
-      {tab === "bulk" &&
-        (canImport ? (
-          <>
-            <BulkSearchForm onUpload={handleBulkUpload} loading={bulkLoading} />
-            {bulkError && <p className="form-error">{bulkError}</p>}
-            <BulkResultsTable data={bulkResult} />
-          </>
-        ) : (
-          <div className="result-card no-win">
-            <p>Your account is awaiting admin approval to import lottery data.</p>
-          </div>
-        ))}
+      {tab === "bulk" && canImport && (
+        <>
+          <BulkSearchForm onUpload={handleBulkUpload} loading={bulkLoading} />
+          {bulkError && <p className="form-error">{bulkError}</p>}
+          <BulkResultsTable data={bulkResult} />
+        </>
+      )}
     </main>
   );
 }

@@ -61,27 +61,29 @@ export default function DrawDetail() {
           <>
             <p><Link to="/draws">← Back to archive</Link></p>
             <div className="result-card">
-              <h3>
+              <h3 className="text-base sm:text-lg font-bold text-slate-900">
                 Draw #{draw.draw_number} — {draw.draw_date} (Bond price: {draw.bond_price} Tk.)
               </h3>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Prize Category</th>
-                    <th>Winning Number</th>
-                    <th>Amount (Tk.)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sortedNumbers.map((w) => (
-                    <tr key={w.id}>
-                      <td>{w.prize_category}</td>
-                      <td>{w.number}</td>
-                      <td>{Number(w.prize_amount).toLocaleString()}</td>
+              <div className="table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Prize Category</th>
+                      <th>Winning Number</th>
+                      <th>Amount (Tk.)</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {sortedNumbers.map((w) => (
+                      <tr key={w.id}>
+                        <td>{w.prize_category}</td>
+                        <td>{w.number}</td>
+                        <td>{Number(w.prize_amount).toLocaleString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </>
         )}

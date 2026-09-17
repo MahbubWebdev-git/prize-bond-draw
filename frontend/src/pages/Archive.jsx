@@ -44,7 +44,7 @@ export default function Archive() {
   }, [page, allowed]);
 
   return (
-    <main>
+    <main className="w-full px-0 sm:px-2">
       <header className="site-header">
         <h1>Draw Results Archive</h1>
         <p className="subtitle">All past lottery / prize bond draws</p>
@@ -57,28 +57,30 @@ export default function Archive() {
 
         {!loading && draws.length > 0 && (
           <div className="result-card">
-            <table>
-              <thead>
-                <tr>
-                  <th>Draw No.</th>
-                  <th>Draw Date</th>
-                  <th>Bond Price</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {draws.map((d) => (
-                  <tr key={d.id}>
-                    <td>{d.draw_number}</td>
-                    <td>{d.draw_date}</td>
-                    <td>{d.bond_price}</td>
-                    <td>
-                      <Link to={`/draws/${d.id}`}>View results →</Link>
-                    </td>
+            <div className="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Draw No.</th>
+                    <th>Draw Date</th>
+                    <th>Bond Price</th>
+                    <th></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {draws.map((d) => (
+                    <tr key={d.id}>
+                      <td>{d.draw_number}</td>
+                      <td>{d.draw_date}</td>
+                      <td>{d.bond_price}</td>
+                      <td>
+                        <Link to={`/draws/${d.id}`}>View results →</Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
